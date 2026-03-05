@@ -117,6 +117,10 @@ app.post('/users', (req, res) => {
         const loginSchema = z.object({
             results: z.array(
                 z.object({
+                    name: z.object({
+                        first: z.string(),
+                        last: z.string(),
+                    }),
                     login: z.object({
                         username: z.string(),
                     }),
@@ -126,4 +130,20 @@ app.post('/users', (req, res) => {
                 })
             ),
         });
-        
+        // Validate the data
+        const validatedData = loginSchema.safeParse(data);
+        if (!validatedData.success) {
+            console.error('Validation errors:', validatedData.error);
+            return res.status(400).json({ error: 'Invalid data received' });
+        } else {
+            const user = validatedData.data.results[0];
+            const fullName = `${user.name.first} ${user.name.last}`;
+            const username = user.login.username;
+            const registeredDate = user.registered.date;
+            res.json({ 'The full name of user is ' : fullName, 'The username is ' : username, 'The registered date is ' : registeredDate });
+        }
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        res.status(500).json({ error: 'Failed to fetch random login data' });
+    }
+});
