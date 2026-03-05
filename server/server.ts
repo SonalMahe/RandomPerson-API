@@ -109,4 +109,21 @@ app.post('/users', (req, res) => {
 // Validate the response with Zod to ensure the fields exist 
 // Optional: Display in the response a short summary like: 'username (registered on YYYY-MM-DD)' 
 
- 
+ app.get('/random-login', async (req, res) => {
+    try {
+        const response = await fetch('https://randomuser.me/api/');
+        const data = await response.json();
+        // Define Zod schema for validation
+        const loginSchema = z.object({
+            results: z.array(
+                z.object({
+                    login: z.object({
+                        username: z.string(),
+                    }),
+                    registered: z.object({
+                        date: z.string(),
+                    }),
+                })
+            ),
+        });
+        
